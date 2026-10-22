@@ -1,3 +1,10 @@
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+import libs
 import os
 
 import torch
@@ -36,6 +43,8 @@ try:
 
     sequence_fasta = text_file_reader(fasta_file)[1]
     sequence_length = len(sequence_fasta)
+    #work here
+    template_fasta = sequence_fasta
     seq_identity_feature_pad = get_sequence_identity_features(fasta_file)
 
     esm_feature_pad = get_esm_embedding(esm_file) # 1152
@@ -45,7 +54,8 @@ try:
     sasa = get_esm_embedding(ss8_file)[:, 1:9]
     charge_t = seq_to_charge(sequence_fasta.upper())
     hydro_t = seq_to_hydrophobicity(sequence_fasta.upper())
-    labels_pad = get_labels_BP3(sequence_fasta)
+
+    labels_pad = get_labels_BP3(template_fasta)
 
     intra = get_intra_emdb(intra_file)
     x4=intra = torch.tensor(intra, dtype=torch.float32).cuda()

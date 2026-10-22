@@ -452,38 +452,6 @@ def convert_raw_bepi_output_files (_input="/home/rajroy/bepipred2_benchmark/test
         save_esm_embedding(pred_arr, output+val+"_predicted_labels.npy")
     return
 
-# convert_raw_bepi_output_files()
-
-
-
-# def cdhit_parse_clstr(path):
-#     clusters = defaultdict(list)
-#     rep = None
-#
-#     with open(path) as f:
-#         for line in f:
-#             line = line.strip()
-#
-#             if line.startswith(">Cluster"):
-#                 rep = None
-#                 continue
-#
-#             # extract sequence ID like 2NYY_A from >2NYY_A...
-#             m = re.search(r">([^.\s,]+)\.\.\.", line)
-#
-#             if not m:
-#                 continue
-#
-#             seq_id = m.group(1)
-#
-#             if line.endswith("*"):
-#                 rep = seq_id
-#                 clusters[rep]  # ensure key exists
-#             else:
-#                 clusters[rep].append(seq_id)
-#
-#     return dict(clusters)
-
 def caps_at_indexes(s, idxs):
     idxs = set(idxs)  # O(1) lookup
     return "".join(
