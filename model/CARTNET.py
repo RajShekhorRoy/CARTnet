@@ -37,9 +37,6 @@ class CARTnet(pl.LightningModule):
         self.fusion_proj_h_1 = nn.Linear(      self.hidden_dim , 1)
         self.save_hyperparameters()
         self.apply(init_weights)
-        self.val_file = "val_090226_{0}.txt".format(ID)
-        self.loss_file = "loss_adl_{0}.txt".format(ID)
-        self.append_to_txt(self.val_file,"epoch,train_loss,val_loss,val_acc,val_precision,val_recall,val_f1,AUC, AUPRC,TOP-10,TOP-l/10\n")
         self.attention_head_size =16
         self.MAX_LENGTH=1400
         # self.cross_attn = self.CrossAttnBlock(128, 128, 128).cuda()
@@ -48,8 +45,6 @@ class CARTnet(pl.LightningModule):
         self.train_losses = []
         self.val_losses = []
         self.test_losses = []
-        # pos_weight = torch.tensor([2.5])
-        # self.loss_fn=  nn.BCEWithLogitsLoss(pos_weight=pos_weight)
         self.loss_fn = FocalLoss(gamma=2,alpha=0.7, task_type='binary', reduction="none")
         # self.instance = nn.InstanceNorm2d( 1, affine=True)
         self.rotary_embeddings = RotaryEmbedding(dim=      self.hidden_dim)
@@ -220,8 +215,6 @@ class CARTnet(pl.LightningModule):
             "val_auc": auc,
             "val_auprc": auprc
         }, prog_bar=True)
-        self.append_to_txt(self.val_file,f"{self.current_epoch},{t_loss:.4f} ,{np.asarray(self.val_losses).mean():.4f}, "
-                                         f"{acc:.4f} , {precision:.4f} , {recall:.4f} , {f1:.4f} , {auc:.4f} ,{auprc:.4f} , {top_10:4f} , {top_l5:4f}")
 
     def on_test_epoch_start(self):
         self.test_outputs = []
@@ -235,7 +228,6 @@ class CARTnet(pl.LightningModule):
         x5 = batch['temp']
         logits = self( x2, x3,x4,x5)
         y = y.reshape(logits.shape)
-        # loss = self.loss_fn(logits, y)
         lengths = batch['length']
         self.test_lengths.extend(lengths.tolist())
         try:
@@ -300,9 +292,6 @@ class CARTnet(pl.LightningModule):
             "val_auc": auc,
             "val_auprc": auprc
         }, prog_bar=True)
-        self.append_to_txt(self.val_file,
-                           f"{self.current_epoch},{t_loss:.4f} ,{np.asarray(self.val_losses).mean():.4f}, "
-                           f"{acc:.4f} , {precision:.4f} , {recall:.4f} , {f1:.4f} , {auc:.4f} ,{auprc:.4f} , {top_10:4f} , {top_l5:4f}")
 
     def predict_one_sample(self, feat_tensor: torch.Tensor):
         self.eval()

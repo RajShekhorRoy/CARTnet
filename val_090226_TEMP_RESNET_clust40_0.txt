@@ -1,2 +1,0 @@
-epoch,train_loss,val_loss,val_acc,val_precision,val_recall,val_f1,AUC, AUPRC,TOP-10,TOP-l/10
-

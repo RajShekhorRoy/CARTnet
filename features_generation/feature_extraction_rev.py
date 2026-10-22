@@ -152,30 +152,34 @@ def geneterate_ESM3_features (_model_gen,_strcuture_path,_output_dir):
 
     return None
 
-input_file = "/home/rajroy/result_dump/test/8UDG_A_struture.pdb"
+# input_file = "/home/rajroy/result_dump/test/8UDG_A_struture.pdb"
+# output_dir="/home/rajroy/result_dump/test/8UDG/"
 device = "cuda"
 generative_model = ESM3.from_pretrained("esm3_sm_open_v1").to(device).eval()
-output_dir="/home/rajroy/result_dump/test/8UDG/"
-
-if os.path.isfile(input_file) :
-    print("Found file :" + input_file)
-else:
-    print("Missing file :" + input_file)
 
 
-try:
-    geneterate_ESM3_features(_model_gen=generative_model, _strcuture_path=input_file, _output_dir=output_dir)
-except :
-    print("Something went wrong in esm3 structure generation:" + input_file)
+def main(input_file,output_dir):
+    if os.path.isfile(input_file):
+       print("Found file :" + str(input_file))
+    else:
+        print("Missing file :" + str(input_file))
 
-try:
-    get_intrachain_file(input_file,output_dir)
-except :
-    print("Something went wrong in intra chain extraction:" + input_file)
-try:
-    dssp_file = run_dssp(input_file,output_dir)
-    get_dssp_data_saved(dssp_file,output_dir)
-except :
-    print("Something went wrong in dssp running" + input_file)
+    try:
+        geneterate_ESM3_features(_model_gen=generative_model, _strcuture_path=input_file, _output_dir=output_dir)
+    except:
+        print("Something went wrong in esm3 structure generation:" + input_file)
 
-pdb_to_fasta(input_file,output_dir)
+    try:
+        get_intrachain_file(input_file, output_dir)
+    except:
+        print("Something went wrong in intra chain extraction:" + input_file)
+    try:
+        dssp_file = run_dssp(input_file, output_dir)
+        get_dssp_data_saved(dssp_file, output_dir)
+    except:
+        print("Something went wrong in dssp running" + input_file)
+
+    fasta_file  = pdb_to_fasta(input_file, output_dir)
+
+    return  fasta_file
+# main()
