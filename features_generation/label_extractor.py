@@ -1,10 +1,13 @@
 import numpy as np
-# ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# ROOT = os.path.dirname(ROOT)
-# sys.path.insert(0, ROOT)
+import os
+import sys
+from features_generation import clean_utils
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(ROOT)
+sys.path.insert(0, ROOT)
 import os
 import copy
-import clean_utils
+
 
 # _input_struct_pdb = "/home/rajroy/result_dump/test/temp_test/6VYV_PLH.pdb"
 # _outputs_dir = "/home/rajroy/result_dump/test/temp_test/"
@@ -83,14 +86,13 @@ def main(_input_struct_pdb,_outputs_dir):
                 # print((r + 1, c + 1, dist[r, c]))
                 combined_epitope_array.append(c + 1)
             clean_utils.write2File(HRF_file_name, HRF_data_str)
-        combined_labels_name = output_new_label_dir + "{0}_{1}_{2}_interacting_residues_distance.txt".format(name,
-                                                                                                             antibody_chains,
-                                                                                                             antigen_chain)
+        combined_labels_name = (output_new_label_dir + "{0}_{1}_{2}_interacting_residues_distance.txt".
+                                format(name,antibody_chains, antigen_chain))
         combined_epitope_array = np.unique(combined_epitope_array)
         combined_epitope_str = clean_utils.get_str_from_array(combined_epitope_array)
         clean_utils.write2File(combined_labels_name, combined_epitope_str)
 
-
+        return combined_labels_name
 # main()
 
 
