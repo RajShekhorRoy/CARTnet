@@ -1,0 +1,4 @@
+/.venv/
+/Data/results/
+__pycache__/
+.idea/
