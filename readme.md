@@ -15,7 +15,7 @@ CARTnet was developed using Python 3.10 and PyTorch with CUDA support. All requi
 **1. Clone the repository**
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/RajShekhorRoy/CARTnet.git
 cd CARTnet
 ```
 
