@@ -1,16 +1,19 @@
 import copy
-import os
+
+import torch
 from esm.models.esm3 import ESM3
 from esm.sdk.api import ESMProtein,  LogitsConfig
 import shutil
-import numpy as np
 import pandas as pd
 import utils
 import subprocess
-from Bio.PDB import PDBParser, PPBuilder
+from Bio.PDB import  PPBuilder
 from pathlib import Path
-from libs import fasta_file_reader, file_reader, save_esm_embedding
-#CRYST1    1.000    1.000    1.000  90.00  90.00  90.00 P 1           1
+from libs import  save_esm_embedding
+import os
+import numpy as np
+from Bio.PDB import PDBParser
+from Bio.PDB.DSSP import DSSP
 
 
 
@@ -104,6 +107,45 @@ def run_dssp(_pdb_path, _output_dir):
     subprocess.run([dssp_exe, "-i", str(pdb_path), "-o", str(dssp_path)],check=True)
     return str(dssp_path)
 
+
+
+def get_dssp_data_saved_new(_input, _output):
+    ID = os.path.basename(_input).split(".")[0]
+    parser = PDBParser(QUIET=True)
+    structure = parser.get_structure(ID, _input)
+    model = structure[0]
+    dssp = DSSP( model,_input,dssp="mkdssp" )
+    ss8_list,sasa_list,phi_list,psi_list = [],[],[],[]
+
+    for key in dssp.keys():
+        data = dssp[key]
+        ss8 = data[2]
+        # Convert DSSP coil/unassigned state to C
+        if ss8 in ("-", " ", ""):
+            ss8 = "C"
+        ss8_list.append(ss8)
+        sasa_list.append(data[3])
+        phi_list.append(data[4])
+        psi_list.append(data[5])
+
+    ss8 = np.array(ss8_list)
+    sasa = np.asarray(sasa_list,dtype=np.float32)
+    phi = np.asarray(phi_list,dtype=np.float32 ) / 360.0
+    psi = np.asarray( psi_list, dtype=np.float32 ) / 360.0
+    ss8_final = utils.one_hot_encode_ss8(ss8)
+    n_residues = len(ss8)
+    kappa = np.zeros( n_residues, dtype=np.float32 )
+    alpha = np.zeros( n_residues, dtype=np.float32 )
+    concat = np.column_stack( (  sasa,ss8_final,kappa,alpha,phi,psi) )
+    assert concat.shape[0] == len(ss8)
+    assert concat.shape[1] == 13, (
+        f"Expected 13 features, got "
+        f"{concat.shape[1]}"
+    )
+    output = os.path.join( _output, f"{ID}_dssp.npy" )
+    save_esm_embedding( embedding=concat, save_path=output  )
+    return output
+
 def get_intrachain_file(_antigen_pdb,_output_dir):
     print("Intra chain feature generation")
     ID = os.path.basename(_antigen_pdb).split(".")[0]
@@ -152,9 +194,8 @@ def geneterate_ESM3_features (_model_gen,_strcuture_path,_output_dir):
 
     return None
 
-# input_file = "/home/rajroy/result_dump/test/8UDG_A_struture.pdb"
-# output_dir="/home/rajroy/result_dump/test/8UDG/"
-device = "cuda"
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
 generative_model = ESM3.from_pretrained("esm3_sm_open_v1").to(device).eval()
 
 
@@ -174,8 +215,7 @@ def main(input_file,output_dir):
     except:
         print("Something went wrong in intra chain extraction:" + input_file)
     try:
-        dssp_file = run_dssp(input_file, output_dir)
-        get_dssp_data_saved(dssp_file, output_dir)
+        get_dssp_data_saved_new(input_file,output_dir)
     except:
         print("Something went wrong in dssp running" + input_file)
 

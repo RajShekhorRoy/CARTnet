@@ -1,7 +1,6 @@
 import argparse
 import os
 from pathlib import Path
-
 from features_generation import feature_extraction_rev, label_extractor, generate_label_fasta, template_fasta_generator
 from inference_code import base_inference_new
 
@@ -62,8 +61,7 @@ def main():
         extracted_label = label_extractor.main(template_struc,template_dir)
         #then pass the info to label fasta
         temp_initial_label_fasta_file = generate_label_fasta.main(template_dir,template_struc)
-        #then genrate all feture
-
+        #then generate all features
         template_fasta = template_fasta_generator.main(temp_initial_label_fasta_file,fasta_antigen_path,str(output_dir)+"/")
         #then get temp fasta
         #then pass to inference
@@ -72,7 +70,6 @@ def main():
             target,
             template_fasta
         )
-
     else:
         print("Running CARTnet basic inference")
         base_inference_new.main(str(output_dir)+"/",target,"")

@@ -1,5 +1,3 @@
-#LATEST MODEL last best
-#DONT TOUCH
 import numpy as np
 import pytorch_lightning as pl
 import torch
@@ -39,7 +37,6 @@ class CARTnet(pl.LightningModule):
         self.apply(init_weights)
         self.attention_head_size =16
         self.MAX_LENGTH=1400
-        # self.cross_attn = self.CrossAttnBlock(128, 128, 128).cuda()
         self.classifier = nn.Sigmoid( )
         # binary classification
         self.train_losses = []

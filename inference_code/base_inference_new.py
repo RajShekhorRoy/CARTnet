@@ -2,7 +2,6 @@
 # sys.path.insert(0, str(PROJECT_ROOT))
 import os
 import torch
-
 from pytorch_lightning import   seed_everything
 from libs import text_file_reader,  save_esm_embedding
 from utils import  get_sequence_identity_features, get_esm_embedding, get_labels_BP3, \
@@ -10,7 +9,6 @@ from utils import  get_sequence_identity_features, get_esm_embedding, get_labels
     seq_to_charge, get_intra_emdb,  random_keep_true_labels
 
 from model import CARTNET
-
 
 MAX_LENGTH = 1400
 seed_everything(42, workers=True)
@@ -20,17 +18,7 @@ BATCH_SIZE =1
 nThreads = 0
 TEMPLATE_COUNT = 0
 
-
-# output_dir="/home/rajroy/result_dump/test/8UDG/".format(ID)
-# os.makedirs(output_dir, exist_ok=True)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# __target ="8UDG_A"
-# esm_file = "/home/rajroy/result_dump/test/8UDG_A/8UDG_A_struture_structure_embed.npy"
-# fasta_file = "/home/rajroy/result_dump/test/8UDG_A/8UDG_A_struture.fasta"
-# ss8_file = "/home/rajroy/result_dump/test/8UDG_A/8UDG_A_struture_dssp.npy"
-# intra_file = "/home/rajroy/result_dump/test/8UDG_A/8UDG_A_struture_dist.npz.npy"
-# template_fasta = "/home/rajroy/result_dump/test/8UDG_A/8UDG_A_struture.fasta"
 
 
 def main(output_dir,__target,_template):
@@ -43,7 +31,6 @@ def main(output_dir,__target,_template):
         template_fasta = fasta_file
         checkpoint_file = "model/model_weights/RES_NO_Temp/RM_NOTemp_FINAL_swiglu082726_lr_EXT20_082626epoch=026.ckpt"
         model = CARTNET.CARTnet.load_from_checkpoint(checkpoint_file)
-        # print("falsesesee")
     else:
         template_fasta = _template
         checkpoint_file = "model/model_weights/Res_TEMP/Res_TEMP_swiglu090226_lr_clust40_082626epoch=045.ckpt"
@@ -67,19 +54,22 @@ def main(output_dir,__target,_template):
     labels_pad = get_labels_BP3(template_fasta)
 
     intra = get_intra_emdb(intra_file)
-    x4 = torch.tensor(intra, dtype=torch.float32).cuda()
+    x4 = torch.tensor(intra, dtype=torch.float32).to(device)
     function_feat = torch.tensor(torch.cat([seq_identity_feature_pad, sasa, charge_t, hydro_t, feat], axis=1),
                                  dtype=torch.float32)
-    x3 =  function_feat.permute(0, 1).unsqueeze(0).cuda()
-    x2 =  esm_feature_pad.permute(1, 0).unsqueeze(0).cuda()
+
+    x3 =  function_feat.permute(0, 1).unsqueeze(0).to(device)
+    x2 =  esm_feature_pad.permute(1, 0).unsqueeze(0).to(device)
     # changes based on tempalte
     if len(_template)>0:
         TEMPLATE_COUNT = torch.count_nonzero(labels_pad > 0).item()
     x5 =  torch.tensor(
-        random_keep_true_labels(label_array=labels_pad, max_keep=TEMPLATE_COUNT)).unsqueeze(dim=0).cuda()
+        random_keep_true_labels(label_array=labels_pad, max_keep=TEMPLATE_COUNT)).unsqueeze(dim=0).to(device)
     # labels_pad = labels_pad.unsqueeze(0)
     logits = model(x2.unsqueeze(dim=0), x3.unsqueeze(dim=0), x4.unsqueeze(dim=0), x5.unsqueeze(dim=0))
-    save_esm_embedding(logits, output_dir + str(__target) + "predicted_labels.npy")
+    save_esm_embedding(logits[0:sequence_length], output_dir + str(__target) + "predicted_labels.npy")
+    print("Saving predictions here:")
+    print("Tensor shape:", logits[0:sequence_length].shape)
     print(output_dir + str(__target) + "predicted_labels.npy")
 
     return  None
