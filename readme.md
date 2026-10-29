@@ -1,14 +1,14 @@
-# CARTnet: Contact-Aware Deep Learning for B-cell Epitope Prediction
+# 🧬 CARTnet: Contact-Aware Deep Learning for B-cell Epitope Prediction
 
 CARTnet is a deep learning framework for residue-level conformational B-cell epitope prediction. It integrates protein structural embeddings, multimodal residue-level features, and intra-chain contact information through contact-aware attention blocks. The framework supports both template-free prediction and template-guided prediction using known epitope residues.
 
-## Model Architecture
+## 🏗️ Model Architecture
 
 ![CARTnet Architecture](features_generation/data_visualization/Network_Diagram.png)
 
 *Figure 1. Overview of the CARTnet framework for residue-level B-cell epitope prediction.*
 
-## Installation
+## ⚙️ Installation
 
 CARTnet was developed using Python 3.10 and PyTorch. CARTnet automatically uses a CUDA-enabled GPU when available and otherwise runs on CPU.
 **1. Clone the repository**
@@ -49,7 +49,7 @@ mkdssp --version
 TIf installing the required system dependencies locally is difficult, CARTnet can instead be run using Docker. The Docker image includes the required system dependencies, including DSSP.
 
 
-## Usage
+## 🚀 Usage
 
 CARTnet supports template-free and template-guided epitope prediction from antigen structures in PDB format.
 
@@ -140,7 +140,7 @@ The generated files will be available on the host at:
 ```
 /home/user/cartnet_results/8UDG_A/
 ```
-### Docker Network Troubleshooting
+### 🐳 Docker Network Troubleshooting
 
 ESM3 model files may be downloaded from Hugging Face during the initial run, so the container requires internet access when the model is not already cached.
 
@@ -162,7 +162,7 @@ docker run --rm \
 ```
 
 
-## Citation
+## 📖 Citation
 
 If you use CARTnet in your research, please cite the associated publication.
 
