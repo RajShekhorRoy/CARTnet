@@ -10,8 +10,7 @@ CARTnet is a deep learning framework for residue-level conformational B-cell epi
 
 ## Installation
 
-CARTnet was developed using Python 3.10 and PyTorch with CUDA support. All required Python packages are listed in `requirements.txt`.
-
+CARTnet was developed using Python 3.10 and PyTorch. CARTnet automatically uses a CUDA-enabled GPU when available and otherwise runs on CPU.
 **1. Clone the repository**
 
 ```bash
@@ -22,8 +21,8 @@ cd CARTnet
 **2. Create and activate a Python environment**
 
 ```bash
-conda create -n cartnet python=3.10 -y
-conda activate cartnet
+python3.10 -m venv .venv
+source .venv/bin/activate
 ```
 
 **3. Install dependencies**
@@ -31,8 +30,24 @@ conda activate cartnet
 ```bash
 pip install -r requirements.txt
 ```
+**4. Install DSSP**
 
-The provided requirements reflect the development environment, including CUDA 12.6-specific PyTorch packages. A compatible GPU environment is recommended.
+CARTnet uses DSSP for structure-based feature generation. DSSP must be available on the system when CARTnet is run directly on the host machine.
+
+On Debian/Ubuntu-based Linux systems:
+```sudo apt-get update
+sudo apt-get install dssp
+```
+
+Verify that DSSP is available:
+```
+mkdssp --version
+```
+
+
+
+TIf installing the required system dependencies locally is difficult, CARTnet can instead be run using Docker. The Docker image includes the required system dependencies, including DSSP.
+
 
 ## Usage
 
@@ -81,6 +96,72 @@ python main.py \
     --output_dir /home/rajroy/test/6W1C/ \
     --template_struc /home/rajroy/test/6VYV_PLH.pdb
 ```
+
+
+
+
+## Docker
+Docker provides an alternative way to run CARTnet without manually configuring its Python and Linux system dependencies. The Docker image includes DSSP, so DSSP does not need to be installed separately on the host machine.
+Docker is recommended as a fallback when local installation is difficult and can also be used to run CARTnet on macOS.
+### Build the Docker image
+Docker must first be installed on the host system. From the CARTnet repository directory, build the image with:
+```
+docker build -t cartnet:latest .
+```
+Run CARTnet with Docker
+```
+docker run --rm \
+    -v /path/to/input_directory:/input:ro \
+    -v /path/to/output_directory:/output \
+    cartnet:latest \
+    --input_struc /input/antigen.pdb \
+    --output_dir /output/results/
+```
+For example, suppose the input structure is located at:
+
+```
+/home/user/proteins/8UDG_A.pdb
+```
+and results should be written under:
+```
+/home/user/cartnet_results/
+```
+
+Run:
+```
+docker run --rm \
+    -v /home/user/proteins:/input:ro \
+    -v /home/user/cartnet_results:/output \
+    cartnet:latest \
+    --input_struc /input/8UDG_A.pdb \
+    --output_dir /output/8UDG_A/
+```
+The generated files will be available on the host at:
+```
+/home/user/cartnet_results/8UDG_A/
+```
+### Docker Network Troubleshooting
+
+ESM3 model files may be downloaded from Hugging Face during the initial run, so the container requires internet access when the model is not already cached.
+
+If Docker on Linux reports a DNS error such as:
+
+Temporary failure in name resolution
+
+try using host networking:
+```
+docker run --rm \
+    --network=host \
+    -v /path/to/input_directory:/input:ro \
+    -v /path/to/output_directory:/output \
+    cartnet:latest \
+    --input_struc /input/antigen.pdb \
+    --output_dir /output/results/
+
+--network=host is a troubleshooting option and is not normally required.
+```
+
+
 ## Citation
 
 If you use CARTnet in your research, please cite the associated publication.
