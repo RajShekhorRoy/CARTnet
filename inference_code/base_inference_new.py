@@ -70,7 +70,7 @@ def main(output_dir,__target,_template):
     save_esm_embedding(logits[0:sequence_length], output_dir + str(__target) + "predicted_labels.npy")
     print("Saving predictions here:")
     print("Tensor shape:", logits[0:sequence_length].shape)
-    print(output_dir + str(__target) + "predicted_labels.npy")
+    print(output_dir + str(__target) + "_predicted_labels.npy")
 
     return  None
 

@@ -70,6 +70,7 @@ python main.py \
     --input_struc /home/rajroy/result_dump/test/8UDG_A.pdb \
     --output_dir /home/rajroy/result_dump/test/new_test_final/
 ```
+The predicted epitope labels will be saved in the output directory as **8UDG_Apredicted_labels.npy**
 
 ### Template-guided Prediction
 
@@ -147,9 +148,9 @@ The generated files will be available on the host at:
 ESM3 model files may be downloaded from Hugging Face during the initial run, so the container requires internet access when the model is not already cached.
 
 If Docker on Linux reports a DNS error such as:
-
+```
 Temporary failure in name resolution
-
+```
 try using host networking:
 ```
 docker run --rm \
