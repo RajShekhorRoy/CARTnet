@@ -46,10 +46,10 @@ mkdssp --version
 
 
 
-TIf installing the required system dependencies locally is difficult, CARTnet can instead be run using Docker. The Docker image includes the required system dependencies, including DSSP.
+If installing the required system dependencies locally is difficult, CARTnet can instead be run using Docker. The Docker image includes the required system dependencies, including DSSP.
 
 
-## 🚀 Usage
+## 💻 Usage
 
 CARTnet supports template-free and template-guided epitope prediction from antigen structures in PDB format.
 
@@ -100,9 +100,11 @@ python main.py \
 
 
 
-## Docker
-Docker provides an alternative way to run CARTnet without manually configuring its Python and Linux system dependencies. The Docker image includes DSSP, so DSSP does not need to be installed separately on the host machine.
-Docker is recommended as a fallback when local installation is difficult and can also be used to run CARTnet on macOS.
+## 🐳 Docker
+Docker is recommended as a fallback when local installation is difficult. Docker must be installed before using the containerized version of CARTnet. See the official Docker installation guide for installation instructions.
+```
+⚠️ Memory requirement: Allocate at least 16 GB of memory to Docker. CARTnet uses ESM3 for feature generation, which requires substantial memory.
+```
 ### Build the Docker image
 Docker must first be installed on the host system. From the CARTnet repository directory, build the image with:
 ```
@@ -140,7 +142,7 @@ The generated files will be available on the host at:
 ```
 /home/user/cartnet_results/8UDG_A/
 ```
-### 🐳 Docker Network Troubleshooting
+### Docker Network Troubleshooting
 
 ESM3 model files may be downloaded from Hugging Face during the initial run, so the container requires internet access when the model is not already cached.
 
